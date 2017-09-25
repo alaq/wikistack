@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
 const models = require('./models');
+const routes = require('./routes');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -18,12 +19,15 @@ app.engine('html', nunjucks.render);
 
 app.use(morgan('dev'));
 
+app.use(routes);
+
 app.use(express.static('./public'));
 
-models.db.sync()
+models.db.sync() // {force: true}
 .then(function(){
   app.listen(3000, function(){
     console.log('server is running');
   });
 })
 .catch(console.error);
+

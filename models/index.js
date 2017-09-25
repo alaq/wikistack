@@ -37,11 +37,27 @@ const Page = db.define('page', {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW
   },
+  tags: {
+    type: Sequelize.ARRAY(Sequelize.STRING)
+  }
+}, {
   getterMethods: {
     route() {
       return '/wiki/' + this.urlTitle;
     }
+  },
+  hooks: {
+    beforeValidate: (page) => {
+      var title = page.dataValues.title;
+      if (title) {
+        page.dataValues.urlTitle = title.replace(' ', '_').replace(/\W/g, '');
+      } else {
+        page.dataValues.urlTitle = Math.random().toString(36).substring(2, 7);
+      }
+    }
   }
 });
+
+Page.belongsTo(User, { as: 'author' });
 
 module.exports = { db, Page, User };
